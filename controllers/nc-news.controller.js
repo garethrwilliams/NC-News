@@ -1,3 +1,4 @@
+
 const models = require('../models/nc-news.model.js');
 
 exports.getTopics = (req, res, next) => {
@@ -17,4 +18,4 @@ exports.getArticleById = (req, res, next) => {
       res.status(200).send({article});
     })
     .catch(next);
-};
+
