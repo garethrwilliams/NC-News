@@ -17,7 +17,7 @@ exports.selectArticleById = async (articleId) => {
   const article = await db.query(sql, [articleId]);
 
   if (article.rows.length === 0) {
-    return Promise.reject({code: 400, error: 'Bad request'});
+    return Promise.reject({code: 404, error: 'Article not found'});
   }
 
   return article.rows[0];

@@ -1,8 +1,8 @@
 exports.customError = (err, req, res, next) => {
   console.log(err);
-  const badRequests = [400];
+  const badRequests = [404];
   if (badRequests.includes(err.code)) {
-    res.status(400).send({error: err.error});
+    res.status(404).send({error: err.error});
   } else {
     next(err);
   }

@@ -44,9 +44,9 @@ describe('GET /api/articles/:article_id', () => {
   });
 
   it('404: return error if article does not exist on db', async () => {
-    const {body} = await request(app).get('/api/articles/20000').expect(400);
+    const {body} = await request(app).get('/api/articles/20000').expect(404);
 
-    expect(body.error).toBe('Bad request');
+    expect(body.error).toBe('Article not found');
   });
 });
 
