@@ -7,3 +7,5 @@ Please create **.env** files locally in order to access the database
 
 > - .env.test should contain:
 >   > `PGDATABASE=nc_news_test`
+
+
