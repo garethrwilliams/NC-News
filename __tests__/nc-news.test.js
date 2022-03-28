@@ -50,7 +50,6 @@ describe('GET /api/articles/:article_id', () => {
   });
 });
 
-
 describe('ERROR testing', () => {
   it('test for path not found', () => {
     return request(app)
