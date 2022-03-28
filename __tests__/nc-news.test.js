@@ -31,13 +31,13 @@ describe('GET /api/articles/:article_id', () => {
 
     expect(body.article).toBeInstanceOf(Object);
     expect(body.article).toMatchObject({
-      author: expect.any(String),
-      title: expect.any(String),
-      article_id: expect.any(Number),
-      body: expect.any(String),
-      topic: expect.any(String),
-      created_at: expect.any(String),
-      votes: expect.any(Number),
+      author: 'jonny',
+      title: 'Living in the shadow of a great man',
+      article_id: 1,
+      body: 'I find this existence challenging',
+      topic: 'mitch',
+      created_at: '2020-07-09T20:11:00.000Z',
+      votes: 100,
     });
 
     expect(body.article.author).toBe('jonny');
