@@ -1,19 +1,22 @@
 const express = require('express');
 const app = express();
-
-const {getTopics} = require('./controllers/nc-news.controller.js');
+const errorHandlers = require('./error-handlers');
+const controllers = require('./controllers/nc-news.controller.js');
 
 app.use(express.json());
 
-app.get('/api/topics', getTopics);
+// Topics
+app.get('/api/topics', controllers.getTopics);
+
+// Articles
+app.get('/api/articles/:article_id', controllers.getArticleById);
 
 app.all('/*', (req, res, next) => {
   res.status(404).send({error: 'Path not found'});
 });
 
-app.use((err, req, res, next) => {
-  console.log('server err:', err);
-  res.status(500).send({error: 'Internal server error'});
-});
+// Error handlers
+app.use(errorHandlers.customError);
+app.use(errorHandlers.serverError);
 
 module.exports = app;
