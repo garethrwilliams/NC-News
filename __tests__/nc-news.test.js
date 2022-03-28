@@ -25,6 +25,31 @@ describe('GET /api/topics', () => {
   });
 });
 
+describe('GET /api/articles/:article_id', () => {
+  it('200: return article by given Id', async () => {
+    const {body} = await request(app).get('/api/articles/1').expect(200);
+
+    expect(body.article).toBeInstanceOf(Object);
+    expect(body.article).toMatchObject({
+      author: 'jonny',
+      title: 'Living in the shadow of a great man',
+      article_id: 1,
+      body: 'I find this existence challenging',
+      topic: 'mitch',
+      created_at: '2020-07-09T20:11:00.000Z',
+      votes: 100,
+    });
+
+    expect(body.article.author).toBe('jonny');
+  });
+
+  it('404: return error if article does not exist on db', async () => {
+    const {body} = await request(app).get('/api/articles/20000').expect(404);
+
+    expect(body.error).toBe('Article not found');
+  });
+});
+
 describe('ERROR testing', () => {
   it('test for path not found', () => {
     return request(app)
