@@ -10,3 +10,21 @@ afterAll(() => db.end());
 describe('testing server works', () => {
   test('it works', () => {});
 });
+
+describe('GET /api/topics', () => {
+  it('200: return contents of topics table', () => {
+    return request(app)
+      .get('/api/topics')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.topics).toBeInstanceOf(Array);
+        expect(body.topics.length).toBe(3);
+        body.topics.forEach((topic) => {
+          expect(topic).toMatchObject({
+            slug: expect.any(String),
+            description: expect.any(String),
+          });
+        });
+      });
+  });
+});
