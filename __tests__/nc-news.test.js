@@ -7,10 +7,6 @@ const testData = require('../db/data/test-data');
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
-describe('testing server works', () => {
-  test('it works', () => {});
-});
-
 describe('GET /api/topics', () => {
   it('200: return contents of topics table', () => {
     return request(app)

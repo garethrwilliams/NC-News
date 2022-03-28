@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-const {getTopics} = require('./controllers/nc-news.controller.js');
+const {getTopics} = require('./controllers/nc-news.controller');
 
 app.use(express.json());
 
