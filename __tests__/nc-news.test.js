@@ -28,3 +28,14 @@ describe('GET /api/topics', () => {
       });
   });
 });
+
+describe('ERROR testing', () => {
+  it('test for path not found', () => {
+    return request(app)
+      .get('/api/not_a_path')
+      .expect(404)
+      .then(({body}) => {
+        expect(body.error).toBe('Path not found');
+      });
+  });
+});
