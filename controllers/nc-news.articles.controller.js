@@ -1,6 +1,14 @@
-const models = {};
-models.articles = require('../models/nc-news.articles.model.js');
-models.topics = require('../models/nc-news.topics.model.js');
+const models = require('../models/');
+
+exports.getArticle = async (req, res, next) => {
+  try {
+    const articles = await models.articles.selectArticle();
+
+    res.status(200).send({articles});
+  } catch (err) {
+    next(err);
+  }
+};
 
 exports.getArticleById = (req, res, next) => {
   const articleId = +req.params.article_id;
