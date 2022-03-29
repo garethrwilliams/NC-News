@@ -13,6 +13,9 @@ app.get('/api/articles', controllers.articles.getArticle);
 app.get('/api/articles/:article_id', controllers.articles.getArticleById);
 app.patch('/api/articles/:article_id', controllers.articles.patchArticleById);
 
+// Users
+app.get('/api/users', controllers.users.getUsers);
+
 app.all('/*', (req, res, next) => {
   res.status(404).send({error: 'Path not found'});
 });

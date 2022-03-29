@@ -1,4 +1,4 @@
-const models = require('../models/');
+const models = require('../models');
 
 exports.getArticle = async (req, res, next) => {
   try {
@@ -9,6 +9,7 @@ exports.getArticle = async (req, res, next) => {
     next(err);
   }
 };
+
 
 exports.getArticleById = (req, res, next) => {
   const articleId = +req.params.article_id;

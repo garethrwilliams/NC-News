@@ -25,6 +25,19 @@ describe('GET /api/topics', () => {
   });
 });
 
+describe('GET /api/users', () => {
+  it('200: returns contents of users table', async () => {
+    const {body} = await request(app).get('/api/users').expect(200);
+
+    expect(body.users).toBeInstanceOf(Array);
+    expect(body.users.length).toBe(4);
+    body.users.forEach((user) => {
+      expect(user).toMatchObject({
+        username: expect.any(String),
+      });
+    });
+  });
+
 describe('GET /api/articles', () => {
   it('200: returns an array of articles', async () => {
     const {body} = await request(app).get('/api/articles').expect(200);
