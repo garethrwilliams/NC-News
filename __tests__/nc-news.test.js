@@ -48,6 +48,20 @@ describe('GET /api/articles/:article_id', () => {
 
     expect(body.error).toBe('Article not found');
   });
+
+  it('400: bad request when id is not a integer', async () => {
+    const {body} = await request(app).get('/api/articles/badId').expect(400);
+
+    expect(body.error).toBe('Bad request');
+  });
+});
+
+describe('GET /api/articles/:article_id', () => {
+  it('200: returns the comment count in relation to the requested article ', async () => {
+    const {body} = await request(app).get('/api/articles/1').expect(200);
+
+    expect(body.article.comment_count).toBe('11');
+  });
 });
 
 describe('ERROR testing', () => {
