@@ -9,28 +9,27 @@ exports.getTopics = (req, res, next) => {
     .catch(next);
 };
 
-exports.getArticleById = (req, res, next) => {
+exports.getArticleById = async (req, res, next) => {
   const articleId = +req.params.article_id;
-  models
-    .selectArticleById(articleId)
-    .then((article) => {
-      res.status(200).send({article});
-    })
-    .catch(next);
+  try {
+    const article = await models.selectArticleById(articleId);
+    res.status(200).send({article});
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.patchArticleById = (req, res, next) => {
+exports.patchArticleById = async (req, res, next) => {
   const articleId = +req.params.article_id;
   const {inc_vote} = req.body;
 
   if (!inc_vote) {
     return next({code: 400, error: 'Please provide vote information'});
   }
-
-  models
-    .updateArticleById(articleId, inc_vote)
-    .then((article) => {
-      res.status(200).send({article});
-    })
-    .catch(next);
+  try {
+    const article = await models.updateArticleById(articleId, inc_vote);
+    res.status(200).send({article});
+  } catch (err) {
+    next(err);
+  }
 };
