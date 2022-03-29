@@ -1,10 +1,7 @@
 const express = require('express');
 const app = express();
 const errorHandlers = require('./error-handlers');
-const controllers = {};
-controllers.topics = require('./controllers/nc-news.topics.controller.js');
-controllers.articles = require('./controllers/nc-news.articles.controller.js');
-
+const controllers = require('./controllers');
 app.use(express.json());
 
 // Topics
@@ -13,6 +10,9 @@ app.get('/api/topics', controllers.topics.getTopics);
 // Articles
 app.get('/api/articles/:article_id', controllers.articles.getArticleById);
 app.patch('/api/articles/:article_id', controllers.articles.patchArticleById);
+
+// Users
+app.get('/api/users', controllers.users.getUsers);
 
 app.all('/*', (req, res, next) => {
   res.status(404).send({error: 'Path not found'});

@@ -1,6 +1,4 @@
-const models = {};
-models.articles = require('../models/nc-news.articles.model.js');
-models.topics = require('../models/nc-news.topics.model.js');
+const models = require('../models');
 
 exports.getTopics = (req, res, next) => {
   models.topics

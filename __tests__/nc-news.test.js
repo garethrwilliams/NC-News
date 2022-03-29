@@ -8,7 +8,7 @@ beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
 describe('GET /api/topics', () => {
-  it.only('200: return contents of topics table', () => {
+  it('200: return contents of topics table', () => {
     return request(app)
       .get('/api/topics')
       .expect(200)
@@ -27,7 +27,7 @@ describe('GET /api/topics', () => {
 
 describe('GET /api/users', () => {
   it('200: returns contents of users table', async () => {
-    const {body} = request(app).get('/api/users').expect(200);
+    const {body} = await request(app).get('/api/users').expect(200);
 
     expect(body.users).toBeInstanceOf(Array);
     expect(body.users.length).toBe(4);
