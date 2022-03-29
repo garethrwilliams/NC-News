@@ -1,13 +1,6 @@
 const db = require('../db/connection');
 const format = require('pg-format');
 
-exports.selectTopics = async () => {
-  const sql = `SELECT * FROM topics`;
-
-  const topics = await db.query(sql);
-  return topics.rows;
-};
-
 exports.selectArticleById = async (articleId) => {
   const sql = `SELECT name AS author, COUNT(comments.body) AS comment_count ,title, articles.article_id, articles.body, topic, articles.created_at, articles.votes
   FROM articles 
