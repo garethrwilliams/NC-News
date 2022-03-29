@@ -120,8 +120,6 @@ describe('POST /api/articles/:article_id/comment', () => {
       .send(newComment)
       .expect(201);
 
-    console.log('body:', body);
-
     expect(body.comment.body).toBe(newComment.body);
   });
 
