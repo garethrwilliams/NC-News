@@ -10,6 +10,7 @@ app.get('/api/topics', controllers.getTopics);
 
 // Articles
 app.get('/api/articles/:article_id', controllers.getArticleById);
+app.patch('/api/articles/:article_id', controllers.patchArticleById);
 
 app.all('/*', (req, res, next) => {
   res.status(404).send({error: 'Path not found'});
