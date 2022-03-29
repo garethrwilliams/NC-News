@@ -10,7 +10,6 @@ exports.getArticle = async (req, res, next) => {
   }
 };
 
-
 exports.getArticleById = (req, res, next) => {
   const articleId = +req.params.article_id;
   models.articles

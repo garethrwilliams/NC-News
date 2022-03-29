@@ -37,6 +37,7 @@ describe('GET /api/users', () => {
       });
     });
   });
+});
 
 describe('GET /api/articles', () => {
   it('200: returns an array of articles', async () => {
@@ -115,9 +116,11 @@ describe('POST /api/articles/:article_id/comment', () => {
     };
 
     const {body} = await request(app)
-      .post('/api/article/2/comment')
+      .post('/api/articles/2/comment')
       .send(newComment)
       .expect(201);
+
+    console.log('body:', body);
 
     expect(body.comment.body).toBe(newComment.body);
   });
@@ -128,12 +131,13 @@ describe('POST /api/articles/:article_id/comment', () => {
     };
 
     const {body} = await request(app)
-      .post('/api/article/2/comment')
+      .post('/api/articles/2/comment')
       .send(newComment)
       .expect(400);
 
     expect(body.error).toBe('Please provide a comment');
   });
+
   it('400: responds with an error if the sent object does not contain a valid username', async () => {
     const newComment = {
       username: 'some_clown',
@@ -141,7 +145,7 @@ describe('POST /api/articles/:article_id/comment', () => {
     };
 
     const {body} = await request(app)
-      .post('/api/article/2/comment')
+      .post('/api/articles/2/comment')
       .send(newComment)
       .expect(400);
 
@@ -155,7 +159,7 @@ describe('POST /api/articles/:article_id/comment', () => {
     };
 
     const {body} = await request(app)
-      .post('/api/article/2/comment')
+      .post('/api/articles/99/comment')
       .send(newComment)
       .expect(404);
 
@@ -169,7 +173,7 @@ describe('POST /api/articles/:article_id/comment', () => {
     };
 
     const {body} = await request(app)
-      .post('/api/article/badId/comment')
+      .post('/api/articles/badId/comment')
       .send(newComment)
       .expect(400);
 
@@ -177,7 +181,7 @@ describe('POST /api/articles/:article_id/comment', () => {
   });
 });
 
-describe.only('PATCH /api/articles/:article_id', () => {
+describe('PATCH /api/articles/:article_id', () => {
   it('200: patches the article and returns the article with updated votes', async () => {
     const vote = {inc_vote: 1};
 
