@@ -4,7 +4,6 @@ exports.getArticle = async (req, res, next) => {
   try {
     const articles = await models.articles.selectArticle();
 
-    console.log('articles:', articles);
     res.status(200).send({articles});
   } catch (err) {
     next(err);
