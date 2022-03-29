@@ -10,6 +10,7 @@ app.get('/api/topics', controllers.getTopics);
 
 // Articles
 app.get('/api/articles/:article_id', controllers.getArticleById);
+app.patch('/api/articles/:article_id', controllers.patchArticleById);
 
 const {getTopics} = require('./controllers/nc-news.controller');
 
