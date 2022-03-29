@@ -94,7 +94,77 @@ describe('GET /api/articles/:article_id', () => {
   });
 });
 
-describe('PATCH /api/articles/:article_id', () => {
+describe('POST /api/articles/:article_id/comment', () => {
+  it('201: posts a comment and returns the newly added comment', async () => {
+    const newComment = {
+      username: 'butter_bridge',
+      body: 'I have strong opinions for money',
+    };
+
+    const {body} = await request(app)
+      .post('/api/article/2/comment')
+      .send(newComment)
+      .expect(201);
+
+    expect(body.comment.body).toBe(newComment.body);
+  });
+
+  it('400: responds with an error if the sent object does not contain a comment', async () => {
+    const newComment = {
+      username: 'butter_bridge',
+    };
+
+    const {body} = await request(app)
+      .post('/api/article/2/comment')
+      .send(newComment)
+      .expect(400);
+
+    expect(body.error).toBe('Please provide a comment');
+  });
+  it('400: responds with an error if the sent object does not contain a valid username', async () => {
+    const newComment = {
+      username: 'some_clown',
+      body: 'A worthless opinion',
+    };
+
+    const {body} = await request(app)
+      .post('/api/article/2/comment')
+      .send(newComment)
+      .expect(400);
+
+    expect(body.error).toBe('Please provide a valid username');
+  });
+
+  it('404: responds with an error if the article id is not present', async () => {
+    const newComment = {
+      username: 'butter_bridge',
+      body: 'I have strong opinions for money',
+    };
+
+    const {body} = await request(app)
+      .post('/api/article/2/comment')
+      .send(newComment)
+      .expect(404);
+
+    expect(body.error).toBe('Article not found');
+  });
+
+  it('400: responds with an error if the article id is not valid', async () => {
+    const newComment = {
+      username: 'butter_bridge',
+      body: 'I have strong opinions for money',
+    };
+
+    const {body} = await request(app)
+      .post('/api/article/badId/comment')
+      .send(newComment)
+      .expect(400);
+
+    expect(body.error).toBe('Bad request');
+  });
+});
+
+describe.only('PATCH /api/articles/:article_id', () => {
   it('200: patches the article and returns the article with updated votes', async () => {
     const vote = {inc_vote: 1};
 
