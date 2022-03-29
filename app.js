@@ -1,9 +1,7 @@
 const express = require('express');
 const app = express();
 const errorHandlers = require('./error-handlers');
-const controllers = {};
-controllers.topics = require('./controllers/nc-news.topics.controller.js');
-controllers.articles = require('./controllers/nc-news.articles.controller.js');
+const controllers = require('./controllers');
 
 app.use(express.json());
 

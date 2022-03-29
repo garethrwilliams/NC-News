@@ -54,9 +54,7 @@ describe('GET /api/articles/:article_id', () => {
 
     expect(body.error).toBe('Bad request');
   });
-});
 
-describe('GET /api/articles/:article_id', () => {
   it('200: returns the comment count in relation to the requested article ', async () => {
     const {body} = await request(app).get('/api/articles/1').expect(200);
 
@@ -64,7 +62,7 @@ describe('GET /api/articles/:article_id', () => {
   });
 });
 
-describe('PATCH /api/articles/id', () => {
+describe('PATCH /api/articles/:article_id', () => {
   it('200: patches the article and returns the article with updated votes', async () => {
     const vote = {inc_vote: 1};
 
@@ -118,7 +116,27 @@ describe('PATCH /api/articles/id', () => {
   });
 });
 
-describe('ERROR testing', () => {
+describe('GET /api/articles', () => {
+  it('200: returns an array of articles', async () => {
+    const {body} = request(app).get('/api/articles').expect(200);
+
+    expect(body.articles).toBeInstanceOf(Array);
+    expect(body.articles.length).toBe(12);
+    body.articles.forEach((article) => {
+      expect(article).toMatchObject({
+        author: expect.any(String),
+        title: expect.any(String),
+        article_id: expect.any(Number),
+        topic: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        comment_count: expect.any(String),
+      });
+    });
+  });
+});
+
+describe.only('ERROR testing', () => {
   it('test for path not found', () => {
     return request(app)
       .get('/api/not_a_path')

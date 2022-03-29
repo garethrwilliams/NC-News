@@ -37,9 +37,6 @@
     "setupFilesAfterEnv": [
       "jest-extended/all"
     ],
-    "verbose": true,
-    "testPathIgnorePatterns": [
-      "<rootDir>/__tests__/utils.test.js"
-    ]
+    "verbose": true
   }
 }
