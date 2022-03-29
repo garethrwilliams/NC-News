@@ -64,6 +64,60 @@ describe('GET /api/articles/:article_id', () => {
   });
 });
 
+describe('PATCH /api/articles/id', () => {
+  it('200: patches the article and returns the article with updated votes', async () => {
+    const vote = {inc_vote: 1};
+
+    const {body} = await request(app)
+      .patch('/api/articles/1')
+      .send(vote)
+      .expect(200);
+
+    expect(body.article.votes).toBe(101);
+  });
+
+  it('200: patches the article and returns the article with updated votes when vote is a negative number', async () => {
+    const vote = {inc_vote: -100};
+
+    const {body} = await request(app)
+      .patch('/api/articles/1')
+      .send(vote)
+      .expect(200);
+
+    expect(body.article.votes).toBe(0);
+  });
+
+  it('404: return error if article does not exist on db', async () => {
+    const vote = {inc_vote: 1};
+    const {body} = await request(app)
+      .patch('/api/articles/20000')
+      .send(vote)
+      .expect(404);
+
+    expect(body.error).toBe('Article not found');
+  });
+
+  it('400: return error if req.body is empty', async () => {
+    const vote = {};
+    const {body} = await request(app)
+      .patch('/api/articles/1')
+      .send(vote)
+      .expect(400);
+
+    expect(body.error).toBe('Please provide vote information');
+  });
+
+  it('400: return error if req.body does not contain vote', async () => {
+    const vote = {author: 'jonny'};
+    const {body} = await request(app)
+      .patch('/api/articles/1')
+      .send(vote)
+      .expect(400);
+
+    expect(body.error).toBe('Please provide vote information');
+  });
+});
+
 describe('ERROR testing', () => {
   it('test for path not found', () => {
     return request(app)
