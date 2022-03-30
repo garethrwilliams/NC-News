@@ -53,3 +53,18 @@ exports.updateArticleById = async (articleId, inc_vote) => {
 
   return article.rows[0];
 };
+
+exports.selectCommentsByArticleId = async (article_id) => {
+  const sql = `SELECT comment_id, comments.votes, comments.created_at, users.name, comments.body
+  FROM comments
+  LEFT JOIN articles ON comments.article_id = articles.article_id
+  LEFT JOIN users ON articles.author = users.username
+  WHERE articles.article_id = $1;`;
+
+  const commentsDbQuery = db.query(sql, [article_id]);
+  const articleDbQuery = this.selectArticleById(article_id);
+
+  const comments = await Promise.all([commentsDbQuery, articleDbQuery]);
+
+  return comments[0].rows;
+};

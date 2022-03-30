@@ -9,8 +9,8 @@ SELECT * FROM articles;
 
 SELECT * FROM comments;
 
-SELECT name AS author, COUNT(comments.body) AS comment_count ,title, articles.article_id, articles.body, topic, articles.created_at, articles.votes
-  FROM articles 
-  JOIN users ON articles.author = users.username
-  LEFT JOIN comments ON comments.article_id = articles.article_id
-  GROUP BY articles.article_id, name, title, articles.article_id, articles.body, topic, articles.created_at, articles.votes;
+SELECT comment_id, comments.votes, comments.created_at, users.username, comments.body
+  FROM comments
+  LEFT JOIN articles ON comments.article_id = articles.article_id
+  LEFT JOIN users ON articles.author = users.username
+  WHERE articles.article_id = 1;
