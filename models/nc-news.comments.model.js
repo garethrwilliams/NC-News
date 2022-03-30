@@ -31,3 +31,13 @@ exports.insertComment = async (article_id, new_comment) => {
 
   return comment.rows[0];
 };
+
+exports.removeComment = async (comment_id) => {
+  const sql = `DELETE FROM comments WHERE comment_id = $1 RETURNING *;`;
+
+  const deletedItem = await db.query(sql, [comment_id]);
+
+  if (deletedItem.rows.length === 0) {
+    return Promise.reject({code: 404, error: 'Comment not found'});
+  }
+};
