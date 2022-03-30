@@ -108,9 +108,11 @@ describe('GET /api/articles/:article_id', () => {
   });
 });
 
-describe.skip('GET /api/articles/:article_id/comments', () => {
+describe('GET /api/articles/:article_id/comments', () => {
   it('200: return the comments related to the article', async () => {
-    const {body} = request(app).get('/api/articles/1/comments').expect(200);
+    const {body} = await request(app)
+      .get('/api/articles/1/comments')
+      .expect(200);
 
     expect(body.comments.length).toBe(11);
     body.comments.forEach((comment) => {
@@ -118,27 +120,33 @@ describe.skip('GET /api/articles/:article_id/comments', () => {
         comment_id: expect.any(Number),
         votes: expect.any(Number),
         created_at: expect.any(String),
-        author: expect.any(String),
+        name: expect.any(String),
         body: expect.any(String),
       });
     });
   });
 
   it('200: empty array if the article exists but has no comments', async () => {
-    const {body} = request(app).get('/api/articles/2/comments').expect(200);
+    const {body} = await request(app)
+      .get('/api/articles/2/comments')
+      .expect(200);
 
     expect(body.comments.length).toBe(0);
-    expect(body.comments).toBe([]);
+    expect(body.comments).toEqual([]);
   });
 
   it('404: error if the article does not exist', async () => {
-    const {body} = request(app).get('/api/articles/99/comments').expect(200);
+    const {body} = await request(app)
+      .get('/api/articles/99/comments')
+      .expect(404);
 
     expect(body.error).toBe('Article not found');
   });
 
   it('400: error if the article_id is not a integer', async () => {
-    const {body} = request(app).get('/api/articles/badId/comments').expect(400);
+    const {body} = await request(app)
+      .get('/api/articles/badId/comments')
+      .expect(400);
 
     expect(body.error).toBe('Bad request');
   });
