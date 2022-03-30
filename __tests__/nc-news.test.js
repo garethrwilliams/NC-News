@@ -37,6 +37,7 @@ describe('GET /api/users', () => {
       });
     });
   });
+});
 
 describe('GET /api/articles', () => {
   it('200: returns an array of articles', async () => {
@@ -177,7 +178,7 @@ describe('POST /api/articles/:article_id/comment', () => {
   });
 });
 
-describe.only('PATCH /api/articles/:article_id', () => {
+describe('PATCH /api/articles/:article_id', () => {
   it('200: patches the article and returns the article with updated votes', async () => {
     const vote = {inc_vote: 1};
 
@@ -231,7 +232,24 @@ describe.only('PATCH /api/articles/:article_id', () => {
   });
 });
 
-describe('ERROR testing', () => {
+describe('DELETE /api/comments/:comment_id', () => {
+  it('204: responds with an empty response body', async () => {
+    const {body} = await request(app).delete('/api/comment/1').expect(204);
+
+    expect(body).toEqual({});
+
+    const comments = await db.query('SELECT * FROM comments');
+    expect(comments.rows.length).toBe(17);
+  });
+
+  it('404: should return an error if the comment is not found', async () => {
+    const {body} = await request(app).delete('/api/comments/99').expect(404);
+
+    expect(body.error).toBe('Comment not found');
+  });
+});
+
+describe.only('General ERROR testing', () => {
   it('test for path not found', () => {
     return request(app)
       .get('/api/not_a_path')
