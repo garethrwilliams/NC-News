@@ -2,8 +2,8 @@ const db = require('../db/connection');
 const format = require('pg-format');
 const models = require('./index');
 
-exports.insertComment = async (articleId, newComment) => {
-  const {username, body} = newComment;
+exports.insertComment = async (article_id, new_comment) => {
+  const {username, body} = new_comment;
 
   if (!body) {
     return Promise.reject({code: 400, error: 'Please provide a comment'});
@@ -20,12 +20,12 @@ exports.insertComment = async (articleId, newComment) => {
     });
   }
 
-  await models.articles.selectArticleById(articleId);
+  await models.articles.selectArticleById(article_id);
 
   const sql = `INSERT INTO comments (body, article_id, author)
     VALUES ($1, $2, $3)
     RETURNING body`;
-  const values = [body, articleId, username];
+  const values = [body, article_id, username];
 
   const comment = await db.query(sql, values);
 
