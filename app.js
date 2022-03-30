@@ -15,6 +15,7 @@ app.patch('/api/articles/:article_id', controllers.articles.patchArticleById);
 
 // Comments
 app.post('/api/articles/:article_id/comment', controllers.comments.postComment);
+app.delete('/api/comments/:comment_id', controllers.comments.deleteComment);
 
 // Users
 app.get('/api/users', controllers.users.getUsers);

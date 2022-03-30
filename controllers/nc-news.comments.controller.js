@@ -15,3 +15,15 @@ exports.postComment = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.deleteComment = async (req, res, next) => {
+  try {
+    const {comment_id} = req.params;
+
+    await models.comments.removeComment(comment_id);
+
+    res.status(204).send({});
+  } catch (err) {
+    next(err);
+  }
+};

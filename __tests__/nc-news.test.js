@@ -233,9 +233,9 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 });
 
-describe.skip('DELETE /api/comments/:comment_id', () => {
+describe('DELETE /api/comments/:comment_id', () => {
   it('204: responds with an empty response body', async () => {
-    const {body} = await request(app).delete('/api/comment/1').expect(204);
+    const {body} = await request(app).delete('/api/comments/1').expect(204);
 
     expect(body).toEqual({});
 
@@ -247,6 +247,12 @@ describe.skip('DELETE /api/comments/:comment_id', () => {
     const {body} = await request(app).delete('/api/comments/99').expect(404);
 
     expect(body.error).toBe('Comment not found');
+  });
+
+  it('400: should return an error if the id is not a int', async () => {
+    const {body} = await request(app).delete('/api/comments/badId').expect(400);
+
+    expect(body.error).toBe('Bad request');
   });
 });
 
