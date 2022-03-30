@@ -249,7 +249,7 @@ describe('DELETE /api/comments/:comment_id', () => {
   });
 });
 
-describe('General ERROR testing', () => {
+describe.only('General ERROR testing', () => {
   it('test for path not found', () => {
     return request(app)
       .get('/api/not_a_path')
