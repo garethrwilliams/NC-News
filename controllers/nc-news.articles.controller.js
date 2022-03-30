@@ -11,9 +11,9 @@ exports.getArticle = async (req, res, next) => {
 };
 
 exports.getArticleById = (req, res, next) => {
-  const {articleId} = req.params;
+  const {article_id} = req.params;
   models.articles
-    .selectArticleById(articleId)
+    .selectArticleById(article_id)
     .then((article) => {
       res.status(200).send({article});
     })
