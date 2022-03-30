@@ -233,7 +233,7 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 });
 
-describe('DELETE /api/comments/:comment_id', () => {
+describe.skip('DELETE /api/comments/:comment_id', () => {
   it('204: responds with an empty response body', async () => {
     const {body} = await request(app).delete('/api/comment/1').expect(204);
 
@@ -250,7 +250,7 @@ describe('DELETE /api/comments/:comment_id', () => {
   });
 });
 
-describe.only('General ERROR testing', () => {
+describe('General ERROR testing', () => {
   it('test for path not found', () => {
     return request(app)
       .get('/api/not_a_path')
