@@ -135,7 +135,6 @@ describe('POST /api/articles/:article_id/comment', () => {
 
     expect(body.error).toBe('Please provide a comment');
   });
-
   it('400: responds with an error if the sent object does not contain a valid username', async () => {
     const newComment = {
       username: 'some_clown',
