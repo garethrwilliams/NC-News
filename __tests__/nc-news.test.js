@@ -233,7 +233,24 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 });
 
-describe('ERROR testing', () => {
+describe('DELETE /api/comments/:comment_id', () => {
+  it('204: responds with an empty response body', async () => {
+    const {body} = await request(app).delete('/api/comment/1').expect(204);
+
+    expect(body).toEqual({});
+
+    const comments = await db.query('SELECT * FROM comments');
+    expect(comments.rows.length).toBe(17);
+  });
+
+  it('404: should return an error if the comment is not found', async () => {
+    const {body} = await request(app).delete('/api/comments/99').expect(404);
+
+    expect(body.error).toBe('Comment not found');
+  });
+});
+
+describe.only('General ERROR testing', () => {
   it('test for path not found', () => {
     return request(app)
       .get('/api/not_a_path')
