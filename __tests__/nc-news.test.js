@@ -399,9 +399,68 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 });
 
+describe('PATCH /api/comments/:comment_id', () => {
+  it('200: patches the comment and returns the comment with updated votes', async () => {
+    const newVote = {inc_vote: 1};
+
+    const {body} = await request(app)
+      .patch('/api/comments/1')
+      .send(newVote)
+      .expect(200);
+
+    expect(body.comment.votes).toBe(17);
+    expect(body.comment).toMatchObject({
+      comment_id: 1,
+      body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+      created_at: '2020-04-06T12:17:00.000Z',
+    });
+  });
+
+  it('200: patches the comment and returns the comment with updated votes when vote is a negative number', async () => {
+    const vote = {inc_vote: -16};
+
+    const {body} = await request(app)
+      .patch('/api/comments/1')
+      .send(vote)
+      .expect(200);
+
+    expect(body.comment.votes).toBe(0);
+  });
+
+  it('400: return error if req.body is empty', async () => {
+    const vote = {};
+    const {body} = await request(app)
+      .patch('/api/comments/1')
+      .send(vote)
+      .expect(400);
+
+    expect(body.error).toBe('Please provide vote information');
+  });
+
+  it('400: return error if req.body does not contain vote', async () => {
+    const vote = {author: 'butter_bridge'};
+    const {body} = await request(app)
+      .patch('/api/comments/1')
+      .send(vote)
+      .expect(400);
+
+    expect(body.error).toBe('Please provide vote information');
+  });
+
+  it('404: return error if comment does not exist on db', async () => {
+    const vote = {inc_vote: 1};
+    const {body} = await request(app)
+      .patch('/api/comments/20000')
+      .send(vote)
+      .expect(404);
+
+    expect(body.error).toBe('Comment not found');
+  });
+});
+
 describe('DELETE /api/comments/:comment_id', () => {
   it('204: responds with an empty response body', async () => {
-    const {body} = await request(app).delete('/api/comments/1').expect(204);
+    const {body} = await request(app).delete('/api/comments/2').expect(204);
 
     expect(body).toEqual({});
 
