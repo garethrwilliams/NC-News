@@ -15,6 +15,12 @@ This API is for the purpose of accessing application data programmatically, the 
 
 ---
 
+## Dependencies
+
+`dotenv`, `express`, `pg`, `pg-format`
+
+---
+
 ## Install repo
 
 ```
