@@ -41,3 +41,14 @@ exports.removeComment = async (comment_id) => {
     return Promise.reject({code: 404, error: 'Comment not found'});
   }
 };
+
+exports.updateCommentById = async (inc_vote, comment_id) => {
+  const sql = `UPDATE comments SET votes = votes + $1 WHERE comment_id = $2 RETURNING *;`;
+
+  const comment = await db.query(sql, [inc_vote, comment_id]);
+  if (comment.rows.length === 0) {
+    return Promise.reject({code: 404, error: 'Comment not found'});
+  }
+
+  return comment.rows[0];
+};
