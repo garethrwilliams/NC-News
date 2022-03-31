@@ -1,32 +1,14 @@
 const express = require('express');
 const app = express();
 const errorHandlers = require('./error-handlers');
-const controllers = require('./controllers');
-const endpoints = require('./endpoints.json');
+const apiRouter = require('./routes/api-router');
 
 app.use(express.json());
 
+app.use('/api', apiRouter);
+
 // Endpoints
 app.get('/api', (req, res) => res.json({endpoints}));
-
-// Topics
-app.get('/api/topics', controllers.topics.getTopics);
-
-// Articles
-app.get('/api/articles', controllers.articles.getArticle);
-app.get('/api/articles/:article_id', controllers.articles.getArticleById);
-app.get(
-  '/api/articles/:article_id/comments',
-  controllers.articles.getCommentsByArticleId
-);
-app.patch('/api/articles/:article_id', controllers.articles.patchArticleById);
-
-// Comments
-app.post('/api/articles/:article_id/comment', controllers.comments.postComment);
-app.delete('/api/comments/:comment_id', controllers.comments.deleteComment);
-
-// Users
-app.get('/api/users', controllers.users.getUsers);
 
 app.all('/*', (req, res, next) => {
   res.status(404).send({error: 'Path not found'});
