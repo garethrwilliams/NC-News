@@ -5,11 +5,10 @@ const apiRouter = require('./routes/api-router');
 
 app.use(express.json());
 
+// API
 app.use('/api', apiRouter);
 
-// Endpoints
-app.get('/api', (req, res) => res.json({endpoints}));
-
+// Safety net
 app.all('/*', (req, res, next) => {
   res.status(404).send({error: 'Path not found'});
 });
