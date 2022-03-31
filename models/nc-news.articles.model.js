@@ -1,15 +1,49 @@
 const db = require('../db/connection');
 const format = require('pg-format');
 
-exports.selectArticle = async () => {
-  const sql = `SELECT name AS author, COUNT(comments.body) AS comment_count ,title, articles.article_id, articles.body, topic, articles.created_at, articles.votes
+exports.selectArticles = async (sort_by, order, topic) => {
+  sort_by = sort_by || 'created_at';
+  order = order || 'DESC';
+
+  const topics = await db.query(`SELECT DISTINCT topic FROM articles;`);
+  const topicsArr = topics.rows.map((e) => e.topic);
+
+  if (topic !== undefined && !topicsArr.includes(topic)) {
+    return Promise.reject({code: 404, error: 'Topic does not exist'});
+  }
+
+  if (
+    ![
+      'author',
+      'title',
+      'article_id',
+      'topic',
+      'created_at',
+      'votes',
+      'comment_count',
+    ].includes(sort_by)
+  ) {
+    return Promise.reject({code: 404, error: 'Sort_by field does not exist'});
+  }
+
+  let sql = `SELECT name AS author, COUNT(comments.body) AS comment_count ,title, articles.article_id, articles.body, topic, articles.created_at, articles.votes
   FROM articles 
   JOIN users ON articles.author = users.username
-  LEFT JOIN comments ON comments.article_id = articles.article_id
-  GROUP BY articles.article_id, name, title, articles.article_id, articles.body, topic, articles.created_at, articles.votes
-  ORDER BY created_at DESC;`;
+  LEFT JOIN comments ON comments.article_id = articles.article_id`;
 
-  const articles = await db.query(sql);
+  const values = [];
+
+  if (topic) {
+    sql += ` WHERE topic = $1`;
+    values.push(topic);
+  }
+
+  sql += ` GROUP BY articles.article_id, name`;
+
+  const sqlFormat = format(` ORDER BY %1$s %2$s;`, sort_by, order);
+  sql += sqlFormat;
+
+  const articles = await db.query(sql, values);
 
   return articles.rows;
 };
