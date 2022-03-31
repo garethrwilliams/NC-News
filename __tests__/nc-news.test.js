@@ -39,6 +39,28 @@ describe('GET /api/users', () => {
   });
 });
 
+describe('GET /api/users/:username', () => {
+  it('200: return user by specified username', async () => {
+    const {body} = await request(app)
+      .get('/api/users/butter_bridge')
+      .expect(200);
+
+    expect(body.user).toBeInstanceOf(Object);
+    expect(body.user).toMatchObject({
+      username: 'butter_bridge',
+      name: 'jonny',
+      avatar_url:
+        'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg',
+    });
+  });
+
+  it('404: bad request when username is not found', async () => {
+    const {body} = await request(app).get('/api/users/badUsername').expect(404);
+
+    expect(body.error).toBe('Username not found');
+  });
+});
+
 describe('GET /api/articles', () => {
   it('200: returns an array of articles', async () => {
     const {body} = await request(app).get('/api/articles').expect(200);
