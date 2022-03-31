@@ -140,20 +140,20 @@ describe('GET /api/articles', () => {
     });
   });
 
-  it('404: returns an error if the sort_by column does not exist', async () => {
-    const {body} = await request(app)
-      .get('/api/articles?sort_by=badRequest')
-      .expect(404);
-
-    expect(body.error).toBe('Sort_by field does not exist');
-  });
-
   it('400: returns an error if the ORDER is a bad request', async () => {
     const {body} = await request(app)
       .get('/api/articles?order=badRequest')
       .expect(400);
 
     expect(body.error).toBe('Bad request');
+  });
+
+  it('404: returns an error if the sort_by column does not exist', async () => {
+    const {body} = await request(app)
+      .get('/api/articles?sort_by=badRequest')
+      .expect(404);
+
+    expect(body.error).toBe('Sort_by field does not exist');
   });
 
   it('404: returns an error if topic is not available', async () => {
@@ -183,18 +183,6 @@ describe('GET /api/articles/:article_id', () => {
     expect(body.article.author).toBe('jonny');
   });
 
-  it('404: return error if article does not exist on db', async () => {
-    const {body} = await request(app).get('/api/articles/20000').expect(404);
-
-    expect(body.error).toBe('Article not found');
-  });
-
-  it('400: bad request when id is not a integer', async () => {
-    const {body} = await request(app).get('/api/articles/badId').expect(400);
-
-    expect(body.error).toBe('Bad request');
-  });
-
   it('200: returns the comment count in relation to the requested article ', async () => {
     const {body} = await request(app).get('/api/articles/1').expect(200);
 
@@ -205,6 +193,18 @@ describe('GET /api/articles/:article_id', () => {
     const {body} = await request(app).get('/api/articles/4').expect(200);
 
     expect(body.article.comment_count).toBe('0');
+  });
+
+  it('400: bad request when id is not a integer', async () => {
+    const {body} = await request(app).get('/api/articles/badId').expect(400);
+
+    expect(body.error).toBe('Bad request');
+  });
+
+  it('404: return error if article does not exist on db', async () => {
+    const {body} = await request(app).get('/api/articles/20000').expect(404);
+
+    expect(body.error).toBe('Article not found');
   });
 });
 
@@ -235,14 +235,6 @@ describe('GET /api/articles/:article_id/comments', () => {
     expect(body.comments).toEqual([]);
   });
 
-  it('404: error if the article does not exist', async () => {
-    const {body} = await request(app)
-      .get('/api/articles/99/comments')
-      .expect(404);
-
-    expect(body.error).toBe('Article not found');
-  });
-
   it('400: error if the article_id is not a integer', async () => {
     const {body} = await request(app)
       .get('/api/articles/badId/comments')
@@ -250,9 +242,17 @@ describe('GET /api/articles/:article_id/comments', () => {
 
     expect(body.error).toBe('Bad request');
   });
+
+  it('404: error if the article does not exist', async () => {
+    const {body} = await request(app)
+      .get('/api/articles/99/comments')
+      .expect(404);
+
+    expect(body.error).toBe('Article not found');
+  });
 });
 
-describe('POST /api/articles/:article_id/comment', () => {
+describe('POST /api/articles/:article_id/comments', () => {
   it('201: posts a comment and returns the newly added comment', async () => {
     const newComment = {
       username: 'butter_bridge',
@@ -260,7 +260,7 @@ describe('POST /api/articles/:article_id/comment', () => {
     };
 
     const {body} = await request(app)
-      .post('/api/articles/2/comment')
+      .post('/api/articles/2/comments')
       .send(newComment)
       .expect(201);
 
@@ -273,7 +273,7 @@ describe('POST /api/articles/:article_id/comment', () => {
     };
 
     const {body} = await request(app)
-      .post('/api/articles/2/comment')
+      .post('/api/articles/2/comments')
       .send(newComment)
       .expect(400);
 
@@ -287,25 +287,11 @@ describe('POST /api/articles/:article_id/comment', () => {
     };
 
     const {body} = await request(app)
-      .post('/api/articles/2/comment')
+      .post('/api/articles/2/comments')
       .send(newComment)
       .expect(400);
 
     expect(body.error).toBe('Please provide a valid username');
-  });
-
-  it('404: responds with an error if the article id is not present', async () => {
-    const newComment = {
-      username: 'butter_bridge',
-      body: 'I have strong opinions for money',
-    };
-
-    const {body} = await request(app)
-      .post('/api/articles/99/comment')
-      .send(newComment)
-      .expect(404);
-
-    expect(body.error).toBe('Article not found');
   });
 
   it('400: responds with an error if the article id is not valid', async () => {
@@ -315,11 +301,25 @@ describe('POST /api/articles/:article_id/comment', () => {
     };
 
     const {body} = await request(app)
-      .post('/api/articles/badId/comment')
+      .post('/api/articles/badId/comments')
       .send(newComment)
       .expect(400);
 
     expect(body.error).toBe('Bad request');
+  });
+
+  it('404: responds with an error if the article id is not present', async () => {
+    const newComment = {
+      username: 'butter_bridge',
+      body: 'I have strong opinions for money',
+    };
+
+    const {body} = await request(app)
+      .post('/api/articles/99/comments')
+      .send(newComment)
+      .expect(404);
+
+    expect(body.error).toBe('Article not found');
   });
 });
 
@@ -387,16 +387,16 @@ describe('DELETE /api/comments/:comment_id', () => {
     expect(comments.rows.length).toBe(17);
   });
 
-  it('404: should return an error if the comment is not found', async () => {
-    const {body} = await request(app).delete('/api/comments/99').expect(404);
-
-    expect(body.error).toBe('Comment not found');
-  });
-
   it('400: should return an error if the id is not a int', async () => {
     const {body} = await request(app).delete('/api/comments/badId').expect(400);
 
     expect(body.error).toBe('Bad request');
+  });
+
+  it('404: should return an error if the comment is not found', async () => {
+    const {body} = await request(app).delete('/api/comments/99').expect(404);
+
+    expect(body.error).toBe('Comment not found');
   });
 });
 
