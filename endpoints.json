@@ -80,6 +80,7 @@
   "PATCH /api/articles/:article_id": {
     "description": "Upadtes the votes for an article",
     "queries": ["article_id"],
+    "body": {"inc_votes": 1},
     "exampleResponse": {
       "article": [
         {
@@ -97,6 +98,10 @@
   "POST /api/articles/:article_id/comment": {
     "description": "posts a comment and returns the newly added comment",
     "queries": ["article_id"],
+    "body": {
+      "username": "butter_bridge",
+      "body": "I have strong opinions for money"
+    },
     "exampleResponse": {
       "comment": [
         {
