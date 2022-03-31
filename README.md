@@ -6,7 +6,7 @@
 
 ## Background
 
-I have built an API for the purpose of accessing application data programmatically. The intention is to mimic a real world backend service which should provide information to frontend architecture.
+This API for the purpose of accessing application data programmatically. The API creates a real world backend service which has the functionality to pass information to frontend architecture
 
 - The API is build using the `node.js` backend runtime environment with `JavaScript` used to implement functionality
 - The database is `PQSL` and interaction takes place using `node-postgres`
