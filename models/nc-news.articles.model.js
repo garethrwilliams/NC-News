@@ -7,8 +7,7 @@ exports.selectArticles = async (sort_by, order, topic) => {
 
   const topics = await db.query(`SELECT DISTINCT topic FROM articles;`);
   const topicsArr = topics.rows.map((e) => e.topic);
-  console.log('topicsArr:', topicsArr, 'topics:', topic);
-  console.log(!topicsArr.includes(topic));
+
   if (topic !== undefined && !topicsArr.includes(topic)) {
     return Promise.reject({code: 404, error: 'Topic does not exist'});
   }
