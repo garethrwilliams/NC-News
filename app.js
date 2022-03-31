@@ -2,8 +2,12 @@ const express = require('express');
 const app = express();
 const errorHandlers = require('./error-handlers');
 const controllers = require('./controllers');
+const endpoints = require('./endpoints.json');
 
 app.use(express.json());
+
+// Endpoints
+app.get('/api', (req, res) => res.json({endpoints}));
 
 // Topics
 app.get('/api/topics', controllers.topics.getTopics);
