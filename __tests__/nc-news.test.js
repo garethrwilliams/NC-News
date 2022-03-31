@@ -345,6 +345,64 @@ describe('POST /api/articles/:article_id/comments', () => {
   });
 });
 
+describe('POST /api/articles', () => {
+  it('201: posts a article and returns the newly added article', async () => {
+    const newArticle = {
+      author: 'butter_bridge',
+      title: 'Meat: is the party over?',
+      body: 'I just want to meat someone who understands meat',
+      topic: 'cats',
+    };
+
+    const {body} = await request(app)
+      .post('/api/articles/')
+      .send(newArticle)
+      .expect(201);
+
+    expect(body.article).toMatchObject({
+      author: 'butter_bridge',
+      title: 'Meat: is the party over?',
+      body: 'I just want to meat someone who understands meat',
+      topic: 'cats',
+      article_id: 13,
+      votes: 0,
+      created_at: expect.any(String),
+      comment_count: 0,
+    });
+  });
+
+  it('400: responds with an error if the sent object does not contain required information', async () => {
+    const newArticle = {
+      author: 'butter_bridge',
+      title: 'Meat: is the party over?',
+    };
+
+    const {body} = await request(app)
+      .post('/api/articles')
+      .send(newarticle)
+      .expect(400);
+
+    expect(body.error).toBe(
+      'Please provide an author, title, body and topic in order to submit a valid article'
+    );
+  });
+  it('400: responds with an error if the sent object does not contain a valid author', async () => {
+    const newArticle = {
+      author: 'some_clown',
+      title: 'Meat: is the party over?',
+      body: 'I just want to meat someone who understands meat',
+      topic: 'cats',
+    };
+
+    const {body} = await request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(400);
+
+    expect(body.error).toBe('Please provide a valid author');
+  });
+});
+
 describe('PATCH /api/articles/:article_id', () => {
   it('200: patches the article and returns the article with updated votes', async () => {
     const vote = {inc_vote: 1};
@@ -481,7 +539,7 @@ describe('DELETE /api/comments/:comment_id', () => {
   });
 });
 
-describe('General ERROR testing', () => {
+describe.only('General ERROR testing', () => {
   it('test for path not found', () => {
     return request(app)
       .get('/api/not_a_path')
