@@ -63,6 +63,106 @@ describe('GET /api/articles', () => {
 
     expect(body.articles).toBeSortedBy('created_at', {descending: true});
   });
+
+  it('200: returns an array of articles ORDERED BY ASC if specified', async () => {
+    const {body} = await request(app)
+      .get('/api/articles?order=ASC')
+      .expect(200);
+
+    expect(body.articles).toBeSortedBy('created_at');
+  });
+
+  it('200: returns an array of articles filtered by topic', async () => {
+    const {body} = await request(app)
+      .get('/api/articles?topic=mitch')
+      .expect(200);
+
+    body.articles.forEach((article) => {
+      expect(article).toMatchObject({
+        topic: 'mitch',
+      });
+    });
+  });
+
+  it('200: articles are sorted by chosen field', async () => {
+    const fields = [
+      'author',
+      'title',
+      'article_id',
+      'topic',
+      'created_at',
+      'votes',
+      'comment_count',
+    ];
+
+    const values = await Promise.all(
+      fields.map((field) =>
+        request(app).get(`/api/articles?sort_by=${field}`).expect(200)
+      )
+    );
+
+    values.forEach((value, i) => {
+      if (fields[i] === 'comment_count') {
+        value.body.articles.forEach(
+          (article) => (article.comment_count = +article.comment_count)
+        );
+      }
+      expect(value.body.articles).toBeSortedBy(`${fields[i]}`, {
+        descending: true,
+      });
+    });
+  });
+
+  it('200: articles are sorted by chosen field and ordered by ASC', async () => {
+    const fields = [
+      'author',
+      'title',
+      'article_id',
+      'topic',
+      'created_at',
+      'votes',
+      'comment_count',
+    ];
+
+    const values = await Promise.all(
+      fields.map((field) =>
+        request(app).get(`/api/articles?sort_by=${field}&order=ASC`).expect(200)
+      )
+    );
+
+    values.forEach((value, i) => {
+      if (fields[i] === 'comment_count') {
+        value.body.articles.forEach(
+          (article) => (article.comment_count = +article.comment_count)
+        );
+      }
+      expect(value.body.articles).toBeSortedBy(`${fields[i]}`);
+    });
+  });
+
+  it('404: returns an error if the sort_by column does not exist', async () => {
+    const {body} = await request(app)
+      .get('/api/articles?sort_by=badRequest')
+      .expect(404);
+
+    expect(body.error).toBe('Sort_by field does not exist');
+  });
+
+  it('400: returns an error if the ORDER is a bad request', async () => {
+    const {body} = await request(app)
+      .get('/api/articles?order=badRequest')
+      .expect(400);
+
+    expect(body.error).toBe('Bad request');
+  });
+
+  it('404: returns an error if topic is not available', async () => {
+    const {body} = await request(app)
+      .get('/api/articles?topic=notAvailable')
+      .expect(404);
+
+    expect(body.error).toBe('Topic does not exist');
+  });
 });
 
 describe('GET /api/articles/:article_id', () => {

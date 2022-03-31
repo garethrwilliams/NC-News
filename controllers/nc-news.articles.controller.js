@@ -2,7 +2,13 @@ const models = require('../models');
 
 exports.getArticle = async (req, res, next) => {
   try {
-    const articles = await models.articles.selectArticle();
+    const {sort_by, order, topic} = req.query;
+
+    const articles = await models.articles.selectArticles(
+      sort_by,
+      order,
+      topic
+    );
 
     res.status(200).send({articles});
   } catch (err) {
