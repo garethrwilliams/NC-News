@@ -2,10 +2,13 @@ const db = require('../db/connection');
 const format = require('pg-format');
 const models = require('./index');
 
-exports.selectArticles = async (sort_by, order, topic) => {
-  sort_by = sort_by || 'created_at';
-  order = order || 'DESC';
-
+exports.selectArticles = async (
+  sort_by = 'created_at',
+  order = 'DESC',
+  topic,
+  limit = 10,
+  p = 1
+) => {
   const topics = await db.query(`SELECT DISTINCT topic FROM articles;`);
   const topicsArr = topics.rows.map((e) => e.topic);
 
@@ -27,6 +30,8 @@ exports.selectArticles = async (sort_by, order, topic) => {
     return Promise.reject({code: 404, error: 'Sort_by field does not exist'});
   }
 
+  let i = 0;
+
   let sql = `SELECT name AS author, COUNT(comments.body) ::int AS comment_count ,title, articles.article_id, articles.body, topic, articles.created_at, articles.votes
   FROM articles 
   JOIN users ON articles.author = users.username
@@ -35,16 +40,24 @@ exports.selectArticles = async (sort_by, order, topic) => {
   const values = [];
 
   if (topic) {
-    sql += ` WHERE topic = $1`;
+    sql += ` WHERE topic = $${++i}`;
     values.push(topic);
   }
 
   sql += ` GROUP BY articles.article_id, name`;
 
-  const sqlFormat = format(` ORDER BY %1$s %2$s;`, sort_by, order);
+  const sqlFormat = format(` ORDER BY %1$s %2$s`, sort_by, order);
   sql += sqlFormat;
 
+  sql += ` LIMIT $${++i} OFFSET $${++i};`;
+  values.push(limit);
+  values.push(limit * (p - 1));
+
   const articles = await db.query(sql, values);
+
+  if (articles.rows.length === 0) {
+    return Promise.reject({code: 404, error: 'There are no further articles'});
+  }
 
   return articles.rows;
 };
@@ -89,17 +102,24 @@ exports.updateArticleById = async (articleId, inc_vote) => {
   return article.rows[0];
 };
 
-exports.selectCommentsByArticleId = async (article_id) => {
+exports.selectCommentsByArticleId = async (article_id, limit = 10, p = 1) => {
   const sql = `SELECT comment_id, comments.votes, comments.created_at, users.username, comments.body
   FROM comments
   LEFT JOIN articles ON comments.article_id = articles.article_id
   LEFT JOIN users ON articles.author = users.username
-  WHERE articles.article_id = $1;`;
+  WHERE articles.article_id = $1
+  lIMIT $2 OFFSET $3;`;
 
-  const commentsDbQuery = db.query(sql, [article_id]);
+  const values = [article_id, limit, limit * (p - 1)];
+
+  const commentsDbQuery = db.query(sql, values);
   const articleDbQuery = this.selectArticleById(article_id);
 
   const comments = await Promise.all([commentsDbQuery, articleDbQuery]);
+
+  if (comments[0].rows.length === 0 && p > 1) {
+    return Promise.reject({code: 404, error: 'There are no further comments'});
+  }
 
   return comments[0].rows;
 };
