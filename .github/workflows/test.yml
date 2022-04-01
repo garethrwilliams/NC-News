@@ -11,3 +11,15 @@ jobs:
     steps:
       - name: say hello
         run: echo 'hello from CI'
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout and clone repo
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm i
+
+      - name: test the ting
+        run: npm t utils
