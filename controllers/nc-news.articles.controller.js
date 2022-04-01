@@ -57,3 +57,15 @@ exports.getCommentsByArticleId = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.postArticle = async (req, res, next) => {
+  try {
+    const new_article = req.body;
+
+    const article = await models.articles.insertArticle(new_article);
+
+    res.status(201).send({article});
+  } catch (err) {
+    next(err);
+  }
+};

@@ -24,7 +24,7 @@ exports.insertComment = async (article_id, new_comment) => {
 
   const sql = `INSERT INTO comments (body, article_id, author)
     VALUES ($1, $2, $3)
-    RETURNING body`;
+    RETURNING body;`;
   const values = [body, article_id, username];
 
   const comment = await db.query(sql, values);

@@ -379,7 +379,7 @@ describe('POST /api/articles', () => {
 
     const {body} = await request(app)
       .post('/api/articles')
-      .send(newarticle)
+      .send(newArticle)
       .expect(400);
 
     expect(body.error).toBe(

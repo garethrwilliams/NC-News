@@ -1,5 +1,6 @@
 const db = require('../db/connection');
 const format = require('pg-format');
+const models = require('./index');
 
 exports.selectArticles = async (sort_by, order, topic) => {
   sort_by = sort_by || 'created_at';
@@ -101,4 +102,36 @@ exports.selectCommentsByArticleId = async (article_id) => {
   const comments = await Promise.all([commentsDbQuery, articleDbQuery]);
 
   return comments[0].rows;
+};
+
+exports.insertArticle = async (new_article) => {
+  const {author, title, body, topic} = new_article;
+
+  if (!author || !title || !body || !topic) {
+    return Promise.reject({
+      code: 400,
+      error:
+        'Please provide an author, title, body and topic in order to submit a valid article',
+    });
+  }
+
+  const validUsernames = await (
+    await models.users.selectUsers()
+  ).map((e) => e.username);
+
+  if (!validUsernames.includes(author)) {
+    return Promise.reject({
+      code: 400,
+      error: 'Please provide a valid author',
+    });
+  }
+
+  const sql = `INSERT INTO articles (author, title, body, topic)
+  VALUES ($1, $2, $3, $4)
+  RETURNING *;`;
+  const values = [author, title, body, topic];
+
+  const article = await db.query(sql, values);
+
+  return article.rows[0];
 };
