@@ -79,6 +79,28 @@ exports.selectArticleById = async (articleId) => {
   return article.rows[0];
 };
 
+exports.selectCommentsByArticleId = async (article_id, limit = 10, p = 1) => {
+  const sql = `SELECT comment_id, comments.votes, comments.created_at, users.username, comments.body
+  FROM comments
+  LEFT JOIN articles ON comments.article_id = articles.article_id
+  LEFT JOIN users ON articles.author = users.username
+  WHERE articles.article_id = $1
+  lIMIT $2 OFFSET $3;`;
+
+  const values = [article_id, limit, limit * (p - 1)];
+
+  const commentsDbQuery = db.query(sql, values);
+  const articleDbQuery = this.selectArticleById(article_id);
+
+  const comments = await Promise.all([commentsDbQuery, articleDbQuery]);
+
+  if (comments[0].rows.length === 0 && p > 1) {
+    return Promise.reject({code: 404, error: 'There are no further comments'});
+  }
+
+  return comments[0].rows;
+};
+
 exports.updateArticleById = async (articleId, inc_vote) => {
   const sql1 = `SELECT votes FROM articles WHERE article_id = $1;`;
 
@@ -100,28 +122,6 @@ exports.updateArticleById = async (articleId, inc_vote) => {
   const article = await db.query(sql3, [articleId]);
 
   return article.rows[0];
-};
-
-exports.selectCommentsByArticleId = async (article_id, limit = 10, p = 1) => {
-  const sql = `SELECT comment_id, comments.votes, comments.created_at, users.username, comments.body
-  FROM comments
-  LEFT JOIN articles ON comments.article_id = articles.article_id
-  LEFT JOIN users ON articles.author = users.username
-  WHERE articles.article_id = $1
-  lIMIT $2 OFFSET $3;`;
-
-  const values = [article_id, limit, limit * (p - 1)];
-
-  const commentsDbQuery = db.query(sql, values);
-  const articleDbQuery = this.selectArticleById(article_id);
-
-  const comments = await Promise.all([commentsDbQuery, articleDbQuery]);
-
-  if (comments[0].rows.length === 0 && p > 1) {
-    return Promise.reject({code: 404, error: 'There are no further comments'});
-  }
-
-  return comments[0].rows;
 };
 
 exports.insertArticle = async (new_article) => {
@@ -158,4 +158,15 @@ exports.insertArticle = async (new_article) => {
   const article = await this.selectArticleById(article_id);
 
   return article;
+};
+
+exports.removeArticleById = async (article_id) => {
+  const sql = `
+  DELETE FROM articles WHERE article_id = $1 RETURNING *;`;
+
+  const deletedArticle = await db.query(sql, [article_id]);
+
+  if (deletedArticle.rows.length === 0) {
+    return Promise.reject({code: 404, error: 'Article not found'});
+  }
 };

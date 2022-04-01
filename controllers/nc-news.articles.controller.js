@@ -18,6 +18,18 @@ exports.getArticle = async (req, res, next) => {
   }
 };
 
+exports.postArticle = async (req, res, next) => {
+  try {
+    const new_article = req.body;
+
+    const article = await models.articles.insertArticle(new_article);
+
+    res.status(201).send({article});
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.getArticleById = (req, res, next) => {
   const {article_id} = req.params;
   models.articles
@@ -63,13 +75,13 @@ exports.getCommentsByArticleId = async (req, res, next) => {
   }
 };
 
-exports.postArticle = async (req, res, next) => {
+exports.deleteArticleById = async (req, res, next) => {
   try {
-    const new_article = req.body;
+    const {article_id} = req.params;
 
-    const article = await models.articles.insertArticle(new_article);
+    await models.articles.removeArticleById(article_id);
 
-    res.status(201).send({article});
+    res.status(204).send({});
   } catch (err) {
     next(err);
   }
