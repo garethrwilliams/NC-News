@@ -23,7 +23,7 @@ jobs:
         with:
           postgresql db: test_db
           postgresql user: garethrwilliams
-          postgres password: password123
+          postgresql password: password123
 
       - name: Install dependencies
         run: npm i
