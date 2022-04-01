@@ -62,11 +62,11 @@ describe('GET /api/users/:username', () => {
 });
 
 describe('GET /api/articles', () => {
-  it('200: returns an array of articles', async () => {
+  it('200: returns an array of articles, default limited to 10', async () => {
     const {body} = await request(app).get('/api/articles').expect(200);
 
     expect(body.articles).toBeInstanceOf(Array);
-    expect(body.articles.length).toBe(12);
+    expect(body.articles.length).toBe(10);
     body.articles.forEach((article) => {
       expect(article).toMatchObject({
         author: expect.any(String),
@@ -84,6 +84,49 @@ describe('GET /api/articles', () => {
     const {body} = await request(app).get('/api/articles').expect(200);
 
     expect(body.articles).toBeSortedBy('created_at', {descending: true});
+  });
+
+  it('200: returns an array of articles sorted by created_by DESC by default and limited to 10 entries per page by default', async () => {
+    const {body} = await request(app).get('/api/articles').expect(200);
+
+    expect(body.articles).toBeSortedBy('created_at', {descending: true});
+    expect(body.articles.length).toBe(10);
+  });
+
+  it('200: returns an array of articles sorted by created_by DESC by default and limited to 5 entries per page if specified', async () => {
+    const {body} = await request(app).get('/api/articles?limit=5').expect(200);
+
+    expect(body.articles).toBeSortedBy('created_at', {descending: true});
+    expect(body.articles.length).toBe(5);
+  });
+
+  it('200: returns an array of articles sorted by created_by DESC by default and limited to 15 entries per page if specified', async () => {
+    const {body} = await request(app).get('/api/articles?limit=15').expect(200);
+
+    expect(body.articles).toBeSortedBy('created_at', {descending: true});
+    expect(body.articles.length).toBe(12);
+  });
+
+  it('200: returns an array of articles sorted by article_id DESC by default and limited to 5 entries per page if specified, defaults to page 1 if no p specified', async () => {
+    const {body} = await request(app)
+      .get('/api/articles?limit=5&sort_by=article_id')
+      .expect(200);
+
+    expect(body.articles).toBeSortedBy('article_id', {descending: true});
+    expect(body.articles.length).toBe(5);
+    expect(body.articles[0].article_id).toBe(12);
+    expect(body.articles[4].article_id).toBe(8);
+  });
+
+  it('200: returns an array of articles sorted by article_id DESC by default and limited to 5 entries per page if specified, displays p2', async () => {
+    const {body} = await request(app)
+      .get('/api/articles?limit=5&sort_by=article_id&p=2')
+      .expect(200);
+
+    expect(body.articles).toBeSortedBy('article_id', {descending: true});
+    expect(body.articles.length).toBe(5);
+    expect(body.articles[0].article_id).toBe(7);
+    expect(body.articles[4].article_id).toBe(3);
   });
 
   it('200: returns an array of articles ORDERED BY ASC if specified', async () => {
@@ -165,6 +208,30 @@ describe('GET /api/articles', () => {
     expect(body.error).toBe('Bad request');
   });
 
+  it('400: returns an error if the page is not a int', async () => {
+    const {body} = await request(app).get('/api/articles?p=bad').expect(400);
+
+    expect(body.error).toBe('Bad request');
+  });
+
+  it('400: returns an error if the page is < 1', async () => {
+    const {body} = await request(app).get('/api/articles?p=-3').expect(400);
+
+    expect(body.error).toBe('Bad request');
+  });
+
+  it('400: returns an error if the limit is < 0', async () => {
+    const {body} = await request(app).get('/api/articles?limit=-1').expect(400);
+
+    expect(body.error).toBe('Bad request');
+  });
+
+  it('404: returns an error if the page does not contain results as the articles have been exhausted', async () => {
+    const {body} = await request(app).get('/api/articles?p=3').expect(404);
+
+    expect(body.error).toBe('There are no further articles');
+  });
+
   it('404: returns an error if the sort_by column does not exist', async () => {
     const {body} = await request(app)
       .get('/api/articles?sort_by=badRequest')
@@ -226,12 +293,12 @@ describe('GET /api/articles/:article_id', () => {
 });
 
 describe('GET /api/articles/:article_id/comments', () => {
-  it('200: return the comments related to the article', async () => {
+  it('200: return the comments related to the article limited to 10 by default', async () => {
     const {body} = await request(app)
       .get('/api/articles/1/comments')
       .expect(200);
 
-    expect(body.comments.length).toBe(11);
+    expect(body.comments.length).toBe(10);
     body.comments.forEach((comment) => {
       expect(comment).toMatchObject({
         comment_id: expect.any(Number),
@@ -241,6 +308,28 @@ describe('GET /api/articles/:article_id/comments', () => {
         body: expect.any(String),
       });
     });
+  });
+
+  it('200: return the comments related to the article limited to 5 if specified', async () => {
+    const {body} = await request(app)
+      .get('/api/articles/1/comments?limit=5')
+      .expect(200);
+
+    expect(body.comments.length).toBe(5);
+    expect(body.comments[0].comment_id).toBe(2);
+    expect(body.comments[4].comment_id).toBe(6);
+    expect(body.comments).toBeSortedBy('comment_id');
+  });
+
+  it('200: return the comments related to the article limited to 5 if specified and displays second page of comments if specified', async () => {
+    const {body} = await request(app)
+      .get('/api/articles/1/comments?limit=5&p=2')
+      .expect(200);
+
+    expect(body.comments.length).toBe(5);
+    expect(body.comments[0].comment_id).toBe(7);
+    expect(body.comments[4].comment_id).toBe(13);
+    expect(body.comments).toBeSortedBy('comment_id');
   });
 
   it('200: empty array if the article exists but has no comments', async () => {
@@ -258,6 +347,38 @@ describe('GET /api/articles/:article_id/comments', () => {
       .expect(400);
 
     expect(body.error).toBe('Bad request');
+  });
+
+  it('400: returns an error if the page is not a int', async () => {
+    const {body} = await request(app)
+      .get('/api/articles/1/comments?p=bad')
+      .expect(400);
+
+    expect(body.error).toBe('Bad request');
+  });
+
+  it('400: returns an error if the page is < 1', async () => {
+    const {body} = await request(app)
+      .get('/api/articles/1/comments?p=-3')
+      .expect(400);
+
+    expect(body.error).toBe('Bad request');
+  });
+
+  it('400: returns an error if the limit is < 0', async () => {
+    const {body} = await request(app)
+      .get('/api/articles/1/comments?limit=-1')
+      .expect(400);
+
+    expect(body.error).toBe('Bad request');
+  });
+
+  it('404: returns an error if the page does not contain results as the comments have been exhausted', async () => {
+    const {body} = await request(app)
+      .get('/api/articles/1/comments?p=3')
+      .expect(404);
+
+    expect(body.error).toBe('There are no further comments');
   });
 
   it('404: error if the article does not exist', async () => {

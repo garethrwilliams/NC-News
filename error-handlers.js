@@ -10,7 +10,7 @@ exports.customError = (err, req, res, next) => {
 
 exports.psqlError = (err, req, res, next) => {
   // console.log(err);
-  const badRequest = ['22P02', '42703', '42601'];
+  const badRequest = ['22P02', '42703', '42601', '2201X', '2201W'];
   if (badRequest.includes(err.code)) {
     res.status(400).send({error: 'Bad request'});
   } else {

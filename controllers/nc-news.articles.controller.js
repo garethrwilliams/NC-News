@@ -2,12 +2,14 @@ const models = require('../models');
 
 exports.getArticle = async (req, res, next) => {
   try {
-    const {sort_by, order, topic} = req.query;
+    const {sort_by, order, topic, limit, p} = req.query;
 
     const articles = await models.articles.selectArticles(
       sort_by,
       order,
-      topic
+      topic,
+      limit,
+      p
     );
 
     res.status(200).send({articles});
@@ -47,9 +49,12 @@ exports.patchArticleById = async (req, res, next) => {
 exports.getCommentsByArticleId = async (req, res, next) => {
   try {
     const {article_id} = req.params;
+    const {limit, p} = req.query;
 
     const comments = await models.articles.selectCommentsByArticleId(
-      article_id
+      article_id,
+      limit,
+      p
     );
 
     res.status(200).send({comments});
