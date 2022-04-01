@@ -8,3 +8,15 @@ exports.getTopics = (req, res, next) => {
     })
     .catch(next);
 };
+
+exports.postTopics = async (req, res, next) => {
+  try {
+    const new_topic = req.body;
+
+    const topic = await models.topics.insertTopic(new_topic);
+
+    res.status(201).send({topic});
+  } catch (err) {
+    next(err);
+  }
+};

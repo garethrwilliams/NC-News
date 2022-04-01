@@ -519,6 +519,40 @@ describe('POST /api/articles', () => {
   });
 });
 
+describe('POST /api/topics', () => {
+  it('201: posts a topic and returns the newly added topic', async () => {
+    const newTopic = {
+      slug: 'topic name here',
+      description: 'description here',
+    };
+
+    const topic = await request(app)
+      .post('/api/topics')
+      .send(newTopic)
+      .expect(201);
+
+    expect(topic.body.topic).toMatchObject({...newTopic});
+
+    const topicsArr = await db.query(`SELECT * FROM topics`);
+    expect(topicsArr.rows.length).toBe(4);
+  });
+
+  it('400: responds with an error if the sent object does not contain required information', async () => {
+    const newTopic = {
+      slug: 'topic name here',
+    };
+
+    const {body} = await request(app)
+      .post('/api/topics')
+      .send(newTopic)
+      .expect(400);
+
+    expect(body.error).toBe(
+      'Please provide a slug and description in order to submit a valid topic'
+    );
+  });
+});
+
 describe('PATCH /api/articles/:article_id', () => {
   it('200: patches the article and returns the article with updated votes', async () => {
     const vote = {inc_vote: 1};
