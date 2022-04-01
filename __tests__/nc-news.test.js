@@ -75,7 +75,7 @@ describe('GET /api/articles', () => {
         topic: expect.any(String),
         created_at: expect.any(String),
         votes: expect.any(Number),
-        comment_count: expect.any(String),
+        comment_count: expect.any(Number),
       });
     });
   });
@@ -124,11 +124,6 @@ describe('GET /api/articles', () => {
     );
 
     values.forEach((value, i) => {
-      if (fields[i] === 'comment_count') {
-        value.body.articles.forEach(
-          (article) => (article.comment_count = +article.comment_count)
-        );
-      }
       expect(value.body.articles).toBeSortedBy(`${fields[i]}`, {
         descending: true,
       });
@@ -193,7 +188,7 @@ describe('GET /api/articles/:article_id', () => {
 
     expect(body.article).toBeInstanceOf(Object);
     expect(body.article).toMatchObject({
-      author: 'jonny',
+      author: 'butter_bridge',
       title: 'Living in the shadow of a great man',
       article_id: 1,
       body: 'I find this existence challenging',
@@ -202,19 +197,19 @@ describe('GET /api/articles/:article_id', () => {
       votes: 100,
     });
 
-    expect(body.article.author).toBe('jonny');
+    expect(body.article.author).toBe('butter_bridge');
   });
 
   it('200: returns the comment count in relation to the requested article ', async () => {
     const {body} = await request(app).get('/api/articles/1').expect(200);
 
-    expect(body.article.comment_count).toBe('11');
+    expect(body.article.comment_count).toBe(11);
   });
 
   it('200: returns the comment count in relation to the requested article when the count is 0', async () => {
     const {body} = await request(app).get('/api/articles/4').expect(200);
 
-    expect(body.article.comment_count).toBe('0');
+    expect(body.article.comment_count).toBe(0);
   });
 
   it('400: bad request when id is not a integer', async () => {
@@ -242,7 +237,7 @@ describe('GET /api/articles/:article_id/comments', () => {
         comment_id: expect.any(Number),
         votes: expect.any(Number),
         created_at: expect.any(String),
-        name: expect.any(String),
+        username: expect.any(String),
         body: expect.any(String),
       });
     });
@@ -539,7 +534,7 @@ describe('DELETE /api/comments/:comment_id', () => {
   });
 });
 
-describe.only('General ERROR testing', () => {
+describe('General ERROR testing', () => {
   it('test for path not found', () => {
     return request(app)
       .get('/api/not_a_path')

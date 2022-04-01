@@ -27,7 +27,7 @@ exports.selectArticles = async (sort_by, order, topic) => {
     return Promise.reject({code: 404, error: 'Sort_by field does not exist'});
   }
 
-  let sql = `SELECT name AS author, COUNT(comments.body) AS comment_count ,title, articles.article_id, articles.body, topic, articles.created_at, articles.votes
+  let sql = `SELECT name AS author, COUNT(comments.body) ::int AS comment_count ,title, articles.article_id, articles.body, topic, articles.created_at, articles.votes
   FROM articles 
   JOIN users ON articles.author = users.username
   LEFT JOIN comments ON comments.article_id = articles.article_id`;
@@ -50,12 +50,12 @@ exports.selectArticles = async (sort_by, order, topic) => {
 };
 
 exports.selectArticleById = async (articleId) => {
-  const sql = `SELECT name AS author, COUNT(comments.body) AS comment_count ,title, articles.article_id, articles.body, topic, articles.created_at, articles.votes
+  const sql = `SELECT users.username AS author, COUNT(comments.body) ::int AS comment_count ,title, articles.article_id, articles.body, topic, articles.created_at, articles.votes
   FROM articles 
   JOIN users ON articles.author = users.username
   LEFT JOIN comments ON comments.article_id = articles.article_id
   WHERE articles.article_id = $1
-  GROUP BY articles.article_id, name, title, articles.article_id, articles.body, topic, articles.created_at, articles.votes;`;
+  GROUP BY articles.article_id, users.username;`;
 
   const article = await db.query(sql, [articleId]);
 
@@ -90,7 +90,7 @@ exports.updateArticleById = async (articleId, inc_vote) => {
 };
 
 exports.selectCommentsByArticleId = async (article_id) => {
-  const sql = `SELECT comment_id, comments.votes, comments.created_at, users.name, comments.body
+  const sql = `SELECT comment_id, comments.votes, comments.created_at, users.username, comments.body
   FROM comments
   LEFT JOIN articles ON comments.article_id = articles.article_id
   LEFT JOIN users ON articles.author = users.username
@@ -128,10 +128,14 @@ exports.insertArticle = async (new_article) => {
 
   const sql = `INSERT INTO articles (author, title, body, topic)
   VALUES ($1, $2, $3, $4)
-  RETURNING *;`;
+  RETURNING article_id;`;
   const values = [author, title, body, topic];
 
-  const article = await db.query(sql, values);
+  let article_id = await db.query(sql, values);
 
-  return article.rows[0];
+  article_id = article_id.rows[0].article_id;
+
+  const article = await this.selectArticleById(article_id);
+
+  return article;
 };
