@@ -75,7 +75,7 @@ describe('GET /api/articles', () => {
         topic: expect.any(String),
         created_at: expect.any(String),
         votes: expect.any(Number),
-        comment_count: expect.any(String),
+        comment_count: expect.any(Number),
       });
     });
   });
@@ -124,11 +124,6 @@ describe('GET /api/articles', () => {
     );
 
     values.forEach((value, i) => {
-      if (fields[i] === 'comment_count') {
-        value.body.articles.forEach(
-          (article) => (article.comment_count = +article.comment_count)
-        );
-      }
       expect(value.body.articles).toBeSortedBy(`${fields[i]}`, {
         descending: true,
       });
@@ -193,7 +188,7 @@ describe('GET /api/articles/:article_id', () => {
 
     expect(body.article).toBeInstanceOf(Object);
     expect(body.article).toMatchObject({
-      author: 'jonny',
+      author: 'butter_bridge',
       title: 'Living in the shadow of a great man',
       article_id: 1,
       body: 'I find this existence challenging',
@@ -202,19 +197,19 @@ describe('GET /api/articles/:article_id', () => {
       votes: 100,
     });
 
-    expect(body.article.author).toBe('jonny');
+    expect(body.article.author).toBe('butter_bridge');
   });
 
   it('200: returns the comment count in relation to the requested article ', async () => {
     const {body} = await request(app).get('/api/articles/1').expect(200);
 
-    expect(body.article.comment_count).toBe('11');
+    expect(body.article.comment_count).toBe(11);
   });
 
   it('200: returns the comment count in relation to the requested article when the count is 0', async () => {
     const {body} = await request(app).get('/api/articles/4').expect(200);
 
-    expect(body.article.comment_count).toBe('0');
+    expect(body.article.comment_count).toBe(0);
   });
 
   it('400: bad request when id is not a integer', async () => {
@@ -242,7 +237,7 @@ describe('GET /api/articles/:article_id/comments', () => {
         comment_id: expect.any(Number),
         votes: expect.any(Number),
         created_at: expect.any(String),
-        name: expect.any(String),
+        username: expect.any(String),
         body: expect.any(String),
       });
     });
@@ -342,6 +337,64 @@ describe('POST /api/articles/:article_id/comments', () => {
       .expect(404);
 
     expect(body.error).toBe('Article not found');
+  });
+});
+
+describe('POST /api/articles', () => {
+  it('201: posts a article and returns the newly added article', async () => {
+    const newArticle = {
+      author: 'butter_bridge',
+      title: 'Meat: is the party over?',
+      body: 'I just want to meat someone who understands meat',
+      topic: 'cats',
+    };
+
+    const {body} = await request(app)
+      .post('/api/articles/')
+      .send(newArticle)
+      .expect(201);
+
+    expect(body.article).toMatchObject({
+      author: 'butter_bridge',
+      title: 'Meat: is the party over?',
+      body: 'I just want to meat someone who understands meat',
+      topic: 'cats',
+      article_id: 13,
+      votes: 0,
+      created_at: expect.any(String),
+      comment_count: 0,
+    });
+  });
+
+  it('400: responds with an error if the sent object does not contain required information', async () => {
+    const newArticle = {
+      author: 'butter_bridge',
+      title: 'Meat: is the party over?',
+    };
+
+    const {body} = await request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(400);
+
+    expect(body.error).toBe(
+      'Please provide an author, title, body and topic in order to submit a valid article'
+    );
+  });
+  it('400: responds with an error if the sent object does not contain a valid author', async () => {
+    const newArticle = {
+      author: 'some_clown',
+      title: 'Meat: is the party over?',
+      body: 'I just want to meat someone who understands meat',
+      topic: 'cats',
+    };
+
+    const {body} = await request(app)
+      .post('/api/articles')
+      .send(newArticle)
+      .expect(400);
+
+    expect(body.error).toBe('Please provide a valid author');
   });
 });
 
