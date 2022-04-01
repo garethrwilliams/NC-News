@@ -666,6 +666,29 @@ describe('PATCH /api/comments/:comment_id', () => {
   });
 });
 
+describe('DELETE /api/articles/:article_id', () => {
+  it('204: responds with an empty response body', async () => {
+    const {body} = await request(app).delete('/api/articles/1').expect(204);
+
+    expect(body).toEqual({});
+
+    const articles = await db.query('SELECT * FROM articles');
+    expect(articles.rows.length).toBe(11);
+  });
+
+  it('400: should return an error if the id is not a int', async () => {
+    const {body} = await request(app).delete('/api/articles/badId').expect(400);
+
+    expect(body.error).toBe('Bad request');
+  });
+
+  it('404: should return an error if the article is not found', async () => {
+    const {body} = await request(app).delete('/api/articles/99').expect(404);
+
+    expect(body.error).toBe('Article not found');
+  });
+});
+
 describe('DELETE /api/comments/:comment_id', () => {
   it('204: responds with an empty response body', async () => {
     const {body} = await request(app).delete('/api/comments/2').expect(204);
