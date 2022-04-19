@@ -2,7 +2,9 @@ const express = require('express');
 const app = express();
 const errorHandlers = require('./error-handlers');
 const apiRouter = require('./routes/api-router');
+const cors = require('cors');
 
+app.use(cors());
 app.use(express.json());
 
 // API

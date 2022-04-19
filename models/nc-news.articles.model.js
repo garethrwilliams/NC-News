@@ -161,8 +161,7 @@ exports.insertArticle = async (new_article) => {
 };
 
 exports.removeArticleById = async (article_id) => {
-  const sql = `
-  DELETE FROM articles WHERE article_id = $1 RETURNING *;`;
+  const sql = `DELETE FROM articles WHERE article_id = $1 RETURNING *;`;
 
   const deletedArticle = await db.query(sql, [article_id]);
 
