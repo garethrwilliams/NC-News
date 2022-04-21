@@ -42,15 +42,15 @@ exports.getArticleById = (req, res, next) => {
 
 exports.patchArticleById = async (req, res, next) => {
   const articleId = +req.params.article_id;
-  const {inc_vote} = req.body;
+  const {inc_votes} = req.body;
 
-  if (!inc_vote) {
+  if (!inc_votes) {
     return next({code: 400, error: 'Please provide vote information'});
   }
   try {
     const article = await models.articles.updateArticleById(
       articleId,
-      inc_vote
+      inc_votes
     );
     res.status(200).send({article});
   } catch (err) {

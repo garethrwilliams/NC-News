@@ -555,7 +555,7 @@ describe('POST /api/topics', () => {
 
 describe('PATCH /api/articles/:article_id', () => {
   it('200: patches the article and returns the article with updated votes', async () => {
-    const vote = {inc_vote: 1};
+    const vote = {inc_votes: 1};
 
     const {body} = await request(app)
       .patch('/api/articles/1')
@@ -566,7 +566,7 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 
   it('200: patches the article and returns the article with updated votes when vote is a negative number', async () => {
-    const vote = {inc_vote: -100};
+    const vote = {inc_votes: -100};
 
     const {body} = await request(app)
       .patch('/api/articles/1')
@@ -577,7 +577,7 @@ describe('PATCH /api/articles/:article_id', () => {
   });
 
   it('404: return error if article does not exist on db', async () => {
-    const vote = {inc_vote: 1};
+    const vote = {inc_votes: 1};
     const {body} = await request(app)
       .patch('/api/articles/20000')
       .send(vote)

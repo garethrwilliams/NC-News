@@ -101,7 +101,7 @@ exports.selectCommentsByArticleId = async (article_id, limit = 10, p = 1) => {
   return comments[0].rows;
 };
 
-exports.updateArticleById = async (articleId, inc_vote) => {
+exports.updateArticleById = async (articleId, inc_votes) => {
   const sql1 = `SELECT votes FROM articles WHERE article_id = $1;`;
 
   let votes = await db.query(sql1, [articleId]);
@@ -110,7 +110,7 @@ exports.updateArticleById = async (articleId, inc_vote) => {
   }
 
   votes = votes.rows[0];
-  votes.votes += inc_vote;
+  votes.votes += inc_votes;
 
   const sql2 = `UPDATE articles SET votes = $1 WHERE article_id = $2;`;
   await db.query(sql2, [votes.votes, articleId]);
