@@ -95,7 +95,7 @@
       ]
     }
   },
-  "POST /api/articles/:article_id/comment": {
+  "POST /api/articles/:article_id/comments": {
     "description": "posts a comment and returns the newly added comment",
     "queries": ["article_id"],
     "body": {
