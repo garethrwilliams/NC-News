@@ -80,10 +80,9 @@ exports.selectArticleById = async (articleId) => {
 };
 
 exports.selectCommentsByArticleId = async (article_id, limit = 10, p = 1) => {
-  const sql = `SELECT comment_id, comments.votes, comments.created_at, users.username, comments.body
+  const sql = `SELECT comment_id, comments.votes, comments.created_at, comments.author AS username, comments.body
   FROM comments
   LEFT JOIN articles ON comments.article_id = articles.article_id
-  LEFT JOIN users ON articles.author = users.username
   WHERE articles.article_id = $1
   lIMIT $2 OFFSET $3;`;
 
