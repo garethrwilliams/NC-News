@@ -32,7 +32,7 @@ exports.selectArticles = async (
 
   let i = 0;
 
-  let sql = `SELECT name AS author, COUNT(comments.body) ::int AS comment_count ,title, articles.article_id, articles.body, topic, articles.created_at, articles.votes
+  let sql = `SELECT name AS author, COUNT(comments.body) ::int AS comment_count ,title, articles.article_id, articles.body, topic, articles.created_at, articles.votes, articles.author AS username
   FROM articles 
   JOIN users ON articles.author = users.username
   LEFT JOIN comments ON comments.article_id = articles.article_id`;
